@@ -43,11 +43,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        {/* Google Analytics 4 – ID: G-BX6MESC5BX */}
+
+        {/* Google Analytics 4 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-BX6MESC5BX"
           strategy="afterInteractive"
         />
+
         <Script id="ga4-init" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
@@ -56,6 +58,12 @@ export default function RootLayout({
             gtag('config', 'G-BX6MESC5BX');
           `}
         </Script>
+
+        {/* TIDIO Chat Widget */}
+        <Script
+          src="//code.tidio.co/dxreegjjcdkice5aii5wegashfeotmbt.js"
+          strategy="afterInteractive"
+        />
 
         {children}
       </body>
