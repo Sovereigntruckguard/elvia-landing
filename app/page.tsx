@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 
 const trailerVideo = {
   src: "/elvia/videos/trailer-elvia.mp4",
@@ -91,7 +93,56 @@ const faqs = [
   },
 ];
 
+// Helpers para gtag seguros
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+    __scroll75_fired?: boolean;
+  }
+}
+
+function safeGtag(...args: any[]) {
+  if (typeof window !== "undefined" && typeof window.gtag === "function") {
+    window.gtag(...args);
+  }
+}
+
 export default function ElviaLanding() {
+  // Tracking de scroll al 75%
+  useEffect(() => {
+    const onScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.body.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) return;
+      const scrolled = (scrollTop / docHeight) * 100;
+
+      if (scrolled > 75 && !window.__scroll75_fired) {
+        window.__scroll75_fired = true;
+        safeGtag("event", "scroll_75", {
+          event_category: "engagement",
+          event_label: "User scrolled 75%",
+        });
+      }
+    };
+
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const trackCTA = () => {
+    safeGtag("event", "cta_comprar", {
+      event_category: "conversion",
+      event_label: "Click Comprar Acceso",
+    });
+  };
+
+  const trackVideoPlay = (videoName: string) => {
+    safeGtag("event", "video_play", {
+      event_category: "videos",
+      event_label: videoName,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* NAVBAR */}
@@ -111,6 +162,7 @@ export default function ElviaLanding() {
               📞 (608) 557-6282
             </a>
             <a
+              onClick={trackCTA}
               href="https://elvia.solyontechnologies.com"
               className="text-xs md:text-sm font-semibold text-black bg-[#E7B8A8] px-4 py-2 rounded-xl shadow hover:opacity-90 transition"
             >
@@ -147,6 +199,7 @@ export default function ElviaLanding() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
+              onClick={trackCTA}
               href="https://elvia.solyontechnologies.com"
               className="inline-flex items-center justify-center rounded-2xl bg-[#E7B8A8] text-black font-semibold px-10 py-4 text-lg shadow-[0_0_40px_rgba(231,184,168,0.45)] hover:opacity-90 transition"
             >
@@ -171,6 +224,7 @@ export default function ElviaLanding() {
                 <video
                   src="/elvia/videos/intro-elvia.mp4"
                   controls
+                  onPlay={() => trackVideoPlay("video_intro")}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -193,6 +247,7 @@ export default function ElviaLanding() {
             <video
               src="/elvia/videos/impact-elvia.mp4"
               controls
+              onPlay={() => trackVideoPlay("video_impacto")}
               className="w-full h-full object-cover bg-black"
             />
           </div>
@@ -206,7 +261,6 @@ export default function ElviaLanding() {
       {/* QUE ES EL-VIA + ECOSISTEMA */}
       <section className="py-16 md:py-20 border-t border-[#2A2A2A]">
         <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-[1.3fr,1.1fr] gap-12 items-start">
-          {/* Columna izquierda */}
           <div>
             <h2 className="text-3xl md:text-4xl font-semibold text-[#E7B8A8] mb-6">
               ¿Qué es EL-VÍA?
@@ -229,7 +283,6 @@ export default function ElviaLanding() {
             </p>
           </div>
 
-          {/* Columna derecha */}
           <div className="space-y-5">
             <div className="bg-[#080808] border border-[#E7B8A8]/40 rounded-3xl p-5 shadow-[0_0_40px_rgba(231,184,168,0.18)]">
               <h3 className="text-lg font-semibold text-[#E7B8A8] mb-3">
@@ -397,6 +450,7 @@ export default function ElviaLanding() {
                 <video
                   src={trailerVideo.src}
                   controls
+                  onPlay={() => trackVideoPlay("trailer_elvia")}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -425,6 +479,7 @@ export default function ElviaLanding() {
                       <video
                         src={v.src}
                         controls
+                        onPlay={() => trackVideoPlay(v.title)}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -456,6 +511,7 @@ export default function ElviaLanding() {
                       <video
                         src={v.src}
                         controls
+                        onPlay={() => trackVideoPlay(v.title)}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -479,7 +535,6 @@ export default function ElviaLanding() {
           <h2 className="text-3xl md:text-4xl font-semibold text-[#E7B8A8] mb-6">
             Certificado oficial EL-VÍA.
           </h2>
-
           <div className="mx-auto max-w-3xl rounded-3xl overflow-hidden border border-[#E7B8A8]/60 shadow-[0_0_40px_rgba(231,184,168,0.25)]">
             <img
               src="/elvia/certificado-elvia.png"
@@ -487,7 +542,6 @@ export default function ElviaLanding() {
               className="w-full h-full object-cover"
             />
           </div>
-
           <p className="text-gray-300 text-sm md:text-base max-w-2xl mx-auto mt-6">
             Al completar el entrenamiento y aprobar el examen inteligente, recibes tu certificado
             oficial con tu nombre, fecha, sello EL-VÍA y firma de Elizabeth Tamayo. Un documento que
@@ -563,6 +617,7 @@ export default function ElviaLanding() {
             inspección sin estar preparado.
           </p>
           <a
+            onClick={trackCTA}
             href="https://elvia.solyontechnologies.com"
             className="inline-flex items-center justify-center rounded-2xl bg-[#E7B8A8] text-black font-semibold px-12 py-4 text-lg shadow-[0_0_50px_rgba(231,184,168,0.55)] hover:opacity-90 transition"
           >
